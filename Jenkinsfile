@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = '/usr/local/bin/node' // Adjust path based on your Jenkins server
+        NODEJS_HOME = '/usr/local/bin/node'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
-        ALLURE_HOME = '/usr/local/allure'   // Adjust path to Allure CLI installation
+        ALLURE_HOME = '/usr/local/allure'
+        ENV_FILE = '.env.stag'
     }
 
     options {
@@ -31,11 +32,15 @@ pipeline {
             }
         }
 
-        stage('Run Tests with Allure') {
+        stage('Cleanup Previous Results') {
             steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    sh 'npx playwright test --reporter=json --output=allure-results'
-                }
+                sh 'rm -rf allure-results allure-report'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'npm run test'
             }
         }
 
